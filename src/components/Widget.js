@@ -15,6 +15,7 @@ const Widget = ({ data }) => {
         border: "0.5px solid black",
         borderRadius: "25px",
         display: "inline-block",
+       // Set the background color of the widget based on the provided color prop
       }}
     >
       <p>Section: {data.section}</p>

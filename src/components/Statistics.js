@@ -4,6 +4,7 @@ import moment from "moment";
 import Table from "react-bootstrap/Table";
 import Widget from "./Widget";
 import "../Widget.css"; // Import the CSS file for Widget styling
+
 const MasterRoute = () => {
   const [sectionData, setSectionData] = useState([]);
 
@@ -19,45 +20,49 @@ const MasterRoute = () => {
       const formattedData = formatSectionData(response.data.sections);
       setSectionData(formattedData);
       console.log(formattedData);
-    } catch (error) { 
+    } catch (error) {
       console.error(error);
     }
   };
 
-  const formatSectionData = (data) => {
-    return data.reduce((formattedData, section) => {
-      const filteredSubsections = section.subsections.filter(
-        (subsection) => subsection.customValue !== null
-      );
+ const formatSectionData = (data) => {
+   if (!Array.isArray(data)) {
+     return []; // Return empty array if data is not an array
+   }
 
-      if (filteredSubsections.length > 0) {
-        filteredSubsections.forEach((subsection) => {
-          const updatedAt = new Date(moment(section.updatedAt));
+   const uniqueSections = {};
 
-          formattedData.push({
-            section: section.section,
-            subsection: subsection,
-            customValue: section.customValue,
-            updatedAt: updatedAt,
-          });
-        });
-      }
+   data.forEach((item) => {
+     const { section, subsections, customValue, updatedAt } = item;
 
-      return formattedData;
-    }, []);
-  };
+     subsections.forEach((subsection) => {
+       const key = section + "|" + subsection;
+       if (!uniqueSections[key] || updatedAt > uniqueSections[key].updatedAt) {
+         uniqueSections[key] = {
+           section: section,
+           subsection: subsection,
+           customValue: customValue,
+           updatedAt: updatedAt,
+          
+         };
+       }
+     });
+   });
+
+   return Object.values(uniqueSections);
+ };
+
+
+
 
   return (
     <div>
       <div>
-        {sectionData.map((data, index) => {
-          // Check if customValue is defined
-          if (data.customValue !== undefined) {
-            return <Widget key={index} data={data} />;
-          } else {
-            return null; // Exclude the widget without customValue
-          }
-        })}
+        {sectionData
+          .filter((data) => data.customValue !== undefined)
+          .map((data, index) => (
+            <Widget key={index} data={data} />
+          ))}
       </div>
 
       <h3>Master View</h3>
@@ -74,20 +79,16 @@ const MasterRoute = () => {
               </tr>
             </thead>
             <tbody>
-              {sectionData.map((data, dataIndex) => {
-                if (data.customValue !== undefined) {
-                  return (
-                    <tr key={dataIndex}>
-                      <td>{data.section}</td>
-                      <td>{data.subsection}</td>
-                      <td>{data.customValue}</td>
-                      <td>{data.updatedAt.toString()}</td>
-                    </tr>
-                  );
-                } else {
-                  return null; // Exclude the row with no customValue
-                }
-              })}
+              {sectionData
+                .filter((data) => data.customValue !== undefined)
+                .map((data, dataIndex) => (
+                  <tr key={dataIndex}>
+                    <td>{data.section}</td>
+                    <td>{data.subsection}</td>
+                    <td>{data.customValue}</td>
+                    <td>{data.updatedAt.toString()}</td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </>
