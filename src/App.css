@@ -6,7 +6,13 @@
   height: 40vmin;
   pointer-events: none;
 }
-
+.numpad{
+  height: 80px;
+  width: 80px;
+  margin : 2px;
+  border: 0.1px solid ghostwhite;
+  border-radius: 50px;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -35,4 +41,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+.rounded-box{
+  border: 1px solid gainsboro;
+width: 100%;
+border-radius: 25px;
 }
