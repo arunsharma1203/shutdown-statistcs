@@ -69,7 +69,7 @@ const MasterRoute = () => {
               <tr>
                 <th>Section</th>
                 <th>Subsection</th>
-                <th>Custom Value</th>
+                <th>Percentage Completed</th>
                 <th>Last Updated</th>
               </tr>
             </thead>

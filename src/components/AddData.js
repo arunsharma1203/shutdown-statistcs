@@ -25,10 +25,14 @@ const KilnForm = () => {
       if (response.ok) {
         const data = await response.json();
         // Set section and subsection options from the fetched data
-        setSectionOptions(data.sections.map((section) => section.section));
-        setSubSectionOptions(
-          data.sections.flatMap((section) => section.subsections)
-        );
+        const uniqueSections = [
+          ...new Set(data.sections.map((section) => section.section)),
+        ];
+        const uniqueSubsections = [
+          ...new Set(data.sections.flatMap((section) => section.subsections)),
+        ];
+        setSectionOptions(uniqueSections);
+        setSubSectionOptions(uniqueSubsections);
       } else {
         console.error("Failed to fetch section options");
       }
@@ -159,8 +163,8 @@ const KilnForm = () => {
                   </div>
                 </div>
                 <div className="row mb-3">
-                  <label className="col-sm-2 col-form-label">Value:</label>
-                  <div className="col-sm-10">
+                  <label className="col-sm-2 col-form-label">Percentage Done:</label>
+                  <div style={{textAlign:"center",display : "flex"}} className="col-sm-10">
                     <input
                       type="range"
                       className="form-range"
@@ -170,14 +174,14 @@ const KilnForm = () => {
                       value={customValue}
                       onChange={handleCustomValueChange}
                     />{" "}
-                    <span style={{ textAlign: "center" }}>
+                    <p style={{ textAlign: "center" }}>
                       <input
-                        style={{ width: "65px" }}
+                        style={{ width: "65px",marginRight : "5px" }}
                         disabled
                         className="form-control"
                         defaultValue={customValue}
                       />
-                    </span>
+                    </p>
                   </div>
                 </div>
                 {/* Submit button */}

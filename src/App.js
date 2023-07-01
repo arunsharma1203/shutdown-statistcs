@@ -17,7 +17,7 @@ function App() {
           <div>
             <h2>Shutdown Statistics</h2>
           </div>
-          <div style={{ textAlign: "center", width: "80%", margin: "10%" }}>
+          <div style={{ textAlign: "center", width: "90%", margin: "10%" }}>
             <div
               style={{ textAlign: "center", width: "100%" }}
              
