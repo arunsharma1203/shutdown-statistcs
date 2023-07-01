@@ -3,7 +3,7 @@ import axios from "axios";
 import moment from "moment";
 import Table from "react-bootstrap/Table";
 import Widget from "./Widget";
-import "../Widget.css"; // Import the CSS file for Widget styling
+import "../Widget.css";
 
 const MasterRoute = () => {
   const [sectionData, setSectionData] = useState([]);
@@ -17,7 +17,7 @@ const MasterRoute = () => {
       const response = await axios.get(
         "https://backend-n15a.onrender.com/sections/sections"
       );
-      const formattedData = formatSectionData(response.data.sections);
+      const formattedData = formatSectionData(response.data);
       setSectionData(formattedData);
       console.log(formattedData);
     } catch (error) {
@@ -25,44 +25,49 @@ const MasterRoute = () => {
     }
   };
 
- const formatSectionData = (data) => {
-   if (!Array.isArray(data)) {
-     return []; // Return empty array if data is not an array
-   }
+  const formatSectionData = (data) => {
+    const formattedSections = {};
 
-   const uniqueSections = {};
+    data.sections.forEach((item) => {
+      const { section, subsections, customValue, updatedAt } = item;
 
-   data.forEach((item) => {
-     const { section, subsections, customValue, updatedAt } = item;
+      if (!formattedSections[section]) {
+        formattedSections[section] = {
+          section: section,
+          subsections: [], // Initialize subsections as an empty array
+          subsectionData: {}, // Initialize subsectionData as an empty object
+          updatedAt: null, // Initialize updatedAt as null
+        };
+      }
 
-     subsections.forEach((subsection) => {
-       const key = section + "|" + subsection;
-       if (!uniqueSections[key] || updatedAt > uniqueSections[key].updatedAt) {
-         uniqueSections[key] = {
-           section: section,
-           subsection: subsection,
-           customValue: customValue,
-           updatedAt: updatedAt,
-          
-         };
-       }
-     });
-   });
+      subsections.forEach((subsection) => {
+        if (!formattedSections[section].subsections.includes(subsection)) {
+          formattedSections[section].subsections.push(subsection);
+        }
+      });
 
-   return Object.values(uniqueSections);
- };
+      if (
+        customValue !== undefined &&
+        (formattedSections[section].updatedAt === null ||
+          updatedAt > formattedSections[section].updatedAt)
+      ) {
+        formattedSections[section].updatedAt = updatedAt;
+      }
 
+      if (customValue !== undefined) {
+        formattedSections[section].subsectionData[subsections[0]] = customValue;
+      }
+    });
 
-
+    return Object.values(formattedSections);
+  };
 
   return (
     <div>
       <div>
-        {sectionData
-          .filter((data) => data.customValue !== undefined)
-          .map((data, index) => (
-            <Widget key={index} data={data} />
-          ))}
+        {sectionData.map((data, index) => (
+          <Widget key={index} data={data} />
+        ))}
       </div>
 
       <h3>Master View</h3>
@@ -79,16 +84,22 @@ const MasterRoute = () => {
               </tr>
             </thead>
             <tbody>
-              {sectionData
-                .filter((data) => data.customValue !== undefined)
-                .map((data, dataIndex) => (
-                  <tr key={dataIndex}>
-                    <td>{data.section}</td>
-                    <td>{data.subsection}</td>
-                    <td>{data.customValue}</td>
-                    <td>{data.updatedAt.toString()}</td>
-                  </tr>
-                ))}
+              {sectionData.map((data, dataIndex) => (
+                <>
+                  {data.subsections.map((subsection, subIndex) => (
+                    <tr key={`${dataIndex}-${subIndex}`}>
+                      <td>{data.section}</td>
+                      <td>{subsection}</td>
+                      <td>
+                        {data.subsectionData[subsection] !== undefined
+                          ? data.subsectionData[subsection]
+                          : "-"}
+                      </td>
+                      <td>{moment(data.updatedAt).toString()}</td>
+                    </tr>
+                  ))}
+                </>
+              ))}
             </tbody>
           </Table>
         </>

@@ -1,37 +1,37 @@
 import React from "react";
 
 const Widget = ({ data }) => {
-  const progressStyle = {
-    width: `${data.customValue}%`,
-  };
+  console.log("data in widget", data);
 
   return (
-    <div
-      className="widget-container"
-      style={{
-        boxShadow:
-          "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-        margin: "10px",
-        border: "0.5px solid black",
-        borderRadius: "25px",
-        display: "inline-block",
-       // Set the background color of the widget based on the provided color prop
-      }}
-    >
-      <p>Section: {data.section}</p>
-      <p>Subsection: {data.subsection}</p>
-      <div className="progress">
-        <div
-          className="progress-bar"
-          role="progressbar"
-          style={progressStyle}
-          aria-valuenow={data.customValue}
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          {data.customValue}%
+    <div className="widget-container">
+      <h3>Section: {data.section}</h3>
+      {data.subsections && data.subsections.length > 0 ? (
+        <div>
+          {data.subsections.map((subsection, index) => (
+            <div key={index}>
+              <p>Subsection: {subsection}</p>
+              <div className="progress">
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  style={{
+                    width: `${data.subsectionData[subsection] || 0}%`, 
+                  }}
+                  aria-valuenow={data.subsectionData[subsection] || 0} 
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  {data.subsectionData[subsection] || 0}% 
+                
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      ) : (
+        <p>No subsections available</p>
+      )}
     </div>
   );
 };
