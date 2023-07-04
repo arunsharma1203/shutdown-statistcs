@@ -4,10 +4,10 @@ const Widget = ({ data }) => {
   console.log("data in widget", data);
 
   return (
-    <div className="widget-container">
+    <div  className="widget-container">
       <h3>Section: {data.section}</h3>
       {data.subsections && data.subsections.length > 0 ? (
-        <div>
+        <div >
           {data.subsections.map((subsection, index) => (
             <div key={index}>
               <p>Subsection: {subsection}</p>

@@ -5,19 +5,25 @@ const MasterEdit = () => {
   const [newSection, setNewSection] = useState("");
   const [newSubSection, setNewSubSection] = useState("");
   const [sections, setSections] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    
     fetchData();
+         
   }, []);
 
   const fetchData = async () => {
+     setIsLoading(true);
     try {
       const response = await axios.get(
         "https://backend-n15a.onrender.com/sections/sections"
       );
       setSections(response.data.sections);
+       setIsLoading(false);
     } catch (error) {
       console.error(error);
+       setIsLoading(false);
     }
   };
 
@@ -89,116 +95,126 @@ const MasterEdit = () => {
 
   return (
     <div>
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <h6 style={{ width: "60%", margin: "5px" }}>
-          Add New Section and Subsection
-        </h6>
-        <input
-          style={{ width: "60%", margin: "5px" }}
-          className="form-control"
-          type="text"
-          placeholder="Section"
-          value={newSection}
-          onChange={(e) => setNewSection(e.target.value)}
-        />
-        <input
-          style={{ width: "60%", margin: "5px" }}
-          className="form-control"
-          type="text"
-          placeholder="Subsection"
-          value={newSubSection}
-          onChange={(e) => setNewSubSection(e.target.value)}
-        />
-        <button
-          style={{ marginLeft: "5px", margin: "5px" }}
-          className="btn btn-primary"
-          onClick={handleAddSection}
-        >
-          Add
-        </button>
-      </div>
+      {isLoading === true ? (
+        <div class="spinner-border" role="status">
+          <span class="sr-only"></span>
+        </div>
+      ) : (
+        <div>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h6 style={{ width: "60%", margin: "5px" }}>
+              Add New Section and Subsection
+            </h6>
+            <input
+              style={{ width: "60%", margin: "5px" }}
+              className="form-control"
+              type="text"
+              placeholder="Section"
+              value={newSection}
+              onChange={(e) => setNewSection(e.target.value)}
+            />
+            <input
+              style={{ width: "60%", margin: "5px" }}
+              className="form-control"
+              type="text"
+              placeholder="Subsection"
+              value={newSubSection}
+              onChange={(e) => setNewSubSection(e.target.value)}
+            />
+            <button
+              style={{ marginLeft: "5px", margin: "5px" }}
+              className="btn btn-primary"
+              onClick={handleAddSection}
+            >
+              Add
+            </button>
+          </div>
 
-      <h3>Edit Sections and Subsections</h3>
+          <h3>Edit Sections and Subsections</h3>
 
-      {sections.length > 0 ? (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Section</th>
-              <th>Subsections</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sections.map((section) => (
-              <tr key={section._id}>
-                <td>{section.section}</td>
-                <td>
-                  {section.subsections.map((subsection) => (
-                    <div key={subsection}>
-                      {subsection}
+          {sections.length > 0 ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Section</th>
+                  <th>Subsections</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sections.map((section) => (
+                  <tr key={section._id}>
+                    <td>{section.section}</td>
+                    <td>
+                      {section.subsections.map((subsection) => (
+                        <div key={subsection}>
+                          {subsection}
+                          <button
+                            style={{ marginLeft: "5px" }}
+                            className="btn btn-sm btn-danger"
+                            onClick={() => handleDeleteSubsection(subsection)}
+                          >
+                            Delete
+                          </button>
+                          <button
+                            style={{ marginLeft: "5px" }}
+                            className="btn btn-sm btn-primary"
+                            onClick={() => {
+                              const updatedSubsection = prompt(
+                                "Enter updated subsection:"
+                              );
+                              if (updatedSubsection) {
+                                handleUpdateSubsection(section._id, {
+                                  subsection: updatedSubsection,
+                                });
+                              }
+                            }}
+                          >
+                            Update
+                          </button>
+                        </div>
+                      ))}
+                    </td>
+                    <td>
                       <button
                         style={{ marginLeft: "5px" }}
                         className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteSubsection(subsection)}
+                        onClick={() => handleDeleteSection(section._id)}
                       >
-                        Delete
+                        Delete Section
                       </button>
                       <button
                         style={{ marginLeft: "5px" }}
                         className="btn btn-sm btn-primary"
                         onClick={() => {
-                          const updatedSubsection = prompt(
-                            "Enter updated subsection:"
+                          const updatedSection = prompt(
+                            "Enter updated section:"
                           );
-                          if (updatedSubsection) {
-                            handleUpdateSubsection(section._id, {
-                              subsection: updatedSubsection,
+                          if (updatedSection) {
+                            handleUpdateSection(section._id, {
+                              section: updatedSection,
                             });
                           }
                         }}
                       >
-                        Update
+                        Update Section
                       </button>
-                    </div>
-                  ))}
-                </td>
-                <td>
-                  <button
-                    style={{ marginLeft: "5px" }}
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleDeleteSection(section._id)}
-                  >
-                    Delete Section
-                  </button>
-                  <button
-                    style={{ marginLeft: "5px" }}
-                    className="btn btn-sm btn-primary"
-                    onClick={() => {
-                      const updatedSection = prompt("Enter updated section:");
-                      if (updatedSection) {
-                        handleUpdateSection(section._id, {
-                          section: updatedSection,
-                        });
-                      }
-                    }}
-                  >
-                    Update Section
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No sections available</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No sections available</p>
+          )}
+        </div>
       )}
     </div>
   );

@@ -7,12 +7,15 @@ import "../Widget.css";
 
 const MasterRoute = () => {
   const [sectionData, setSectionData] = useState([]);
+  const [isLoading, setIsloading] =useState(false);
 
   useEffect(() => {
+    
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    setIsloading(true);
     try {
       const response = await axios.get(
         "https://backend-n15a.onrender.com/sections/sections"
@@ -20,7 +23,9 @@ const MasterRoute = () => {
       const formattedData = formatSectionData(response.data);
       setSectionData(formattedData);
       console.log(formattedData);
+      setIsloading(false);
     } catch (error) {
+      setIsloading(false);
       console.error(error);
     }
   };
@@ -64,47 +69,55 @@ const MasterRoute = () => {
 
   return (
     <div>
-      <div>
-        {sectionData.map((data, index) => (
-          <Widget key={index} data={data} />
-        ))}
-      </div>
-
-      <h3>Master View</h3>
-
-      {sectionData && sectionData.length > 0 ? (
-        <>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Section</th>
-                <th>Subsection</th>
-                <th>Percentage Completed</th>
-                <th>Last Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sectionData.map((data, dataIndex) => (
-                <>
-                  {data.subsections.map((subsection, subIndex) => (
-                    <tr key={`${dataIndex}-${subIndex}`}>
-                      <td>{data.section}</td>
-                      <td>{subsection}</td>
-                      <td>
-                        {data.subsectionData[subsection] !== undefined
-                          ? data.subsectionData[subsection]
-                          : "-"}
-                      </td>
-                      <td>{moment(data.updatedAt).toString()}</td>
-                    </tr>
-                  ))}
-                </>
-              ))}
-            </tbody>
-          </Table>
-        </>
+      {isLoading === true ? (
+        <div class="spinner-border" role="status">
+          <span class="sr-only"></span>
+        </div>
       ) : (
-        <p>No data available</p>
+        <div>
+          <div style={{marginTop:"25px"}}>
+            {sectionData.map((data, index) => (
+              <Widget key={index} data={data} />
+            ))}
+          </div>
+
+          <h3>Master View</h3>
+
+          {sectionData && sectionData.length > 0 ? (
+            <>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Section</th>
+                    <th>Subsection</th>
+                    <th>Percentage Completed</th>
+                    <th>Last Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sectionData.map((data, dataIndex) => (
+                    <>
+                      {data.subsections.map((subsection, subIndex) => (
+                        <tr key={`${dataIndex}-${subIndex}`}>
+                          <td>{data.section}</td>
+                          <td>{subsection}</td>
+                          <td>
+                            {data.subsectionData[subsection] !== undefined
+                              ? data.subsectionData[subsection]
+                              : "-"}
+                          </td>
+                          <td>{moment(data.updatedAt).toString()}</td>
+                        </tr>
+                      ))}
+                    </>
+                  ))}
+                </tbody>
+              </Table>
+            </>
+          ) : (
+            <p>No data available</p>
+          )}
+        </div>
       )}
     </div>
   );
